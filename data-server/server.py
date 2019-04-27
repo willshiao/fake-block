@@ -8,7 +8,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pickle
 
@@ -61,4 +61,4 @@ def classify():
                 print('Predicted: {}'.format(encoder.classes_[y_hat[i]]))
             else:
                 print('Predicted: {}'.format(y_hat[i]))
-    return '{"success": true}'
+    return jsonify({ 'success': True })
