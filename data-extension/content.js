@@ -35,20 +35,25 @@ function jon () {
     // test = !test
   })
   console.log('Sending: ', tweets)
-  $.ajax({
-    type: 'POST',
-    url: 'http://localhost:5000/classify',
-    data: JSON.stringify(tweets),
-    contentType: 'application/json',
-    success: (res) => {
-      console.log('Got response: ', res)
-      setTimeout(jon, 200)
-    },
-    error: (err) => {
-      console.error('Failed!!!!!', err)
-    },
-    dataType: 'json'
+
+  chrome.runtime.sendMessage({ data: tweets }, function (response) {
+    console.log('Got response:', response)
   })
+
+  // $.ajax({
+  //   type: 'POST',
+  //   url: 'https://fakeblock.org/classify',
+  //   data: JSON.stringify(tweets),
+  //   contentType: 'application/json',
+  //   success: (res) => {
+  //     console.log('Got response: ', res)
+  //     setTimeout(jon, 200)
+  //   },
+  //   error: (err) => {
+  //     console.error('Failed!!!!!', err)
+  //   },
+  //   dataType: 'json'
+  // })
 }
 
 $(function () {
