@@ -54,11 +54,14 @@ def classify():
     y_hat = classifier.predict(X)
 
     print('Get {} items'.format(len(content)))
+
+    outputList = list()
     for i in range(len(content)):
         if (encoder is not None and encoder.classes_[y_hat[i]] != 'neither') or y_hat[i] == 1:
             print('Content: {}'.format(content[i]['text']))
+            outputList.append(content[i]['id'])
             if encoder is not None:
                 print('Predicted: {}'.format(encoder.classes_[y_hat[i]]))
             else:
                 print('Predicted: {}'.format(y_hat[i]))
-    return jsonify({ 'success': True })
+    return jsonify({ 'success': True, 'ids': outputList })
