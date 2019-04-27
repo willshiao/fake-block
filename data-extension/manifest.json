@@ -2,12 +2,18 @@
   "name": "Fake Block",
   "version": "1.0",
   "description": "Blocks unwanted information on Twitter",
-  "permissions": ["activeTab", "declarativeContent", "storage"],
+  "permissions": [
+    "activeTab",
+    "declarativeContent",
+    "storage",
+    "http://localhost/"
+  ],
   "options_page": "options.html",
   "background": {
     "scripts": ["background.js"],
     "persistent": false
   },
+  "content_security_policy": "default-src 'self';connect-src 'self' https://* http://*;",
   "page_action": {
     "default_popup": "popup.html",
     "default_icon": {
