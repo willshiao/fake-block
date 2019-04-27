@@ -38,22 +38,18 @@ function jon () {
 
   chrome.runtime.sendMessage({ data: tweets }, function (response) {
     console.log('Got response:', response)
-  })
+    const toHide = new Set(response.ids)
 
-  // $.ajax({
-  //   type: 'POST',
-  //   url: 'https://fakeblock.org/classify',
-  //   data: JSON.stringify(tweets),
-  //   contentType: 'application/json',
-  //   success: (res) => {
-  //     console.log('Got response: ', res)
-  //     setTimeout(jon, 200)
-  //   },
-  //   error: (err) => {
-  //     console.error('Failed!!!!!', err)
-  //   },
-  //   dataType: 'json'
-  // })
+    tweetList.each((key, li) => {
+      const $li = $(li)
+      if ($li.data() && toHide.has($li.data().itemId)) {
+        // console.log('Hiding: ', $li.data().itemId)
+        // $li.fadeOut(3000)
+        $li.css('display', 'none')
+      }
+    })
+    setTimeout(jon, 200)
+  })
 }
 
 $(function () {
