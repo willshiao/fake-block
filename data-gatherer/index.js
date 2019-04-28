@@ -6,7 +6,7 @@ const Twitter = require('twitter')
 Promise.promisifyAll(Twitter.prototype)
 const fs = Promise.promisifyAll(require('fs'))
 const _ = require('lodash')
-const {createObjectCsvWriter} = require('csv-writer')
+const { createObjectCsvWriter } = require('csv-writer')
 const client = new Twitter(config.get('twitter'))
 
 function getClassification (row) {
@@ -16,10 +16,11 @@ function getClassification (row) {
 async function main () {
   if (process.argv.length < 3) process.exit(1)
   // const data = fs.readFileSync('data/NLP+CSS_2016.tsv', 'utf8')
+
   const data = fs.readFileSync(process.argv[2], 'utf8')
     .split('\n')
-    .map(line => line.split(','))
-    // .map(line => line.split('\t'))
+    // .map(line => line.split(','))
+    .map(line => line.split('\t'))
     .slice(1)
   const csvWriter = createObjectCsvWriter({
     path: `data/cleaned_${Date.now()}.csv`,
@@ -76,5 +77,3 @@ async function getTweetData (chunk) {
 }
 
 main()
-  // .then(tweets => {
-  // })
