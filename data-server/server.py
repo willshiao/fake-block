@@ -71,7 +71,7 @@ def test():
 def classify():
     content = request.get_json()
 
-    if vectorizer is None:
+    if vectorizer is not None:
         docs = [cleanText(doc['text']) for doc in content]
         X = vectorizer.transform(docs)
         y_hat = classifier.predict(X)
