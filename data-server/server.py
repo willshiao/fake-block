@@ -75,6 +75,18 @@ CORS(app)
 def test():
     return 'Hello! This is a test. - Jon'
 
+
+@app.route('/mark')
+def mark():
+    tweet_id = request.args.get('id')
+    if len(tweet_id) == 0:
+        return jsonify({ 'success': False, 'message': 'Invalid tweet ID' })
+    if r is None:
+        return jsonify({ 'success': False, 'message': 'Redis not intialized' })
+    r.set(tweet_id, 1)
+    return jsonify({ 'success': True })
+
+
 @app.route('/classify', methods=['POST'])
 def classify():
     content = request.get_json()
@@ -84,8 +96,11 @@ def classify():
     if r is None:
         docs = content
     else:
-        for i in range(len(content)):
-            t_id = content[i]['id']
+        for con in content:
+            if 'id' not in con:
+                # Invalid tweet, skip
+                continue
+            t_id = con['id']
             if r.exists(t_id):
                 redis_res = r.get(t_id)
                 if redis_res == b'1':
@@ -94,7 +109,7 @@ def classify():
                 else:
                     print('Cache hit for {} (not spam)'.format(t_id))
             else:
-                docs.append(content[i])
+                docs.append(con)
 
     if len(docs) > 0:
         if vectorizer is not None:
