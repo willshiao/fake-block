@@ -87,9 +87,12 @@ def classify():
         for i in range(len(content)):
             t_id = content[i]['id']
             if r.exists(t_id):
-                print('Cache hit for {}'.format(t_id))
-                if r.get(t_id) == b'1':
+                redis_res = r.get(t_id)
+                if redis_res == b'1':
                     output_list.append(t_id)
+                    print('Cache hit for {} (spam)'.format(t_id))
+                else:
+                    print('Cache hit for {} (not spam)'.format(t_id))
             else:
                 docs.append(content[i])
 
@@ -111,7 +114,6 @@ def classify():
         if is_bad:
             print('docs: {}'.format(docs[i]['text']))
             output_list.append(d_id)
-
 
             if encoder is None:
                 print('Predicted: {}'.format(y_hat[i]))
