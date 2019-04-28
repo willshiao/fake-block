@@ -88,7 +88,7 @@ def classify():
             t_id = content[i]['id']
             if r.exists(t_id):
                 print('Cache hit for {}'.format(t_id))
-                if r.get(t_id) == 1:
+                if r.get(t_id) == b'1':
                     output_list.append(t_id)
             else:
                 docs.append(content[i])
