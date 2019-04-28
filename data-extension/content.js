@@ -61,6 +61,7 @@ function jon () {
 
     tweetList.each((key, li) => {
       const $li = $(li)
+      
       if ($li.data() && toHide.has($li.data().itemId)) {
         const particles = new Particles(li, {
           direction: 'left',
@@ -75,6 +76,21 @@ function jon () {
         // console.log('Hiding: ', $li.data().itemId)
         // $li.fadeOut(3000)
         // $li.css('display', 'none')
+      } else if (!($li.hasClass("spamButton"))) {
+        const spamButton = $('<button class="spamButton" />').addClass('spamButton').text('Spam?')
+        spamButton.click(function() {
+          const particles = new Particles(li, {
+            direction: 'left',
+            color: 'black',
+            complete () {
+              $li.css('display', 'none')
+              $li.parent().parent().remove()
+            }
+          })
+          particleQueue.push(particles)   
+        })
+        spamButton.prependTo($li)
+        $li.addClass('spamButton')
       }
     })
     // executeQueue(particleQueue, 0)
