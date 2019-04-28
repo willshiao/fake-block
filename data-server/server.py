@@ -106,9 +106,9 @@ def classify():
 
     for i in range(len(docs)):
         is_bad = (encoder is not None and encoder.classes_[y_hat[i]] != 'neither') or y_hat[i] == 1
+        d_id = docs[i]['id']
 
         if is_bad:
-            d_id = docs[i]['id']
             print('docs: {}'.format(docs[i]['text']))
             output_list.append(d_id)
 
