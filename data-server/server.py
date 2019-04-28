@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import redis
+import os
 import string
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.preprocessing import LabelEncoder
@@ -12,8 +14,14 @@ from sklearn.metrics import accuracy_score
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pickle
-
 import spacy
+
+r = None
+if 'REDIS_HOST' in os.environ:
+    print('Redis settings found!')
+    r = redis.Redis(host=os.environ['REDIS_HOST'])
+else:
+    print('REDIS_HOST not found... not using Redis')
 
 nlp = spacy.load('en_vectors_web_lg', disable=['parser', 'tagger', 'ner', 'textcat'])
 
@@ -70,25 +78,47 @@ def test():
 @app.route('/classify', methods=['POST'])
 def classify():
     content = request.get_json()
+    output_list = []
+    docs = []
+
+    if r is None:
+        docs = content
+    else:
+        for i in range(len(content)):
+            t_id = content[i]['id']
+            if r.exists(t_id):
+                print('Cache hit for {}'.format(t_id))
+                if r.get(t_id) == 1:
+                    output_list.append(t_id)
+            else:
+                docs.append(t_id)
+
 
     if vectorizer is not None:
-        docs = [cleanText(doc['text']) for doc in content]
+        docs = [cleanText(doc['text']) for doc in docs]
         X = vectorizer.transform(docs)
         y_hat = classifier.predict(X)
-
     else:
-        X = np.array([vectorizeText(x) for x in content])
+        X = np.array([vectorizeText(x) for x in docs])
         y_hat = classifier.predict(X)
     
-    print('Got {} items'.format(len(content)))
-    outputList = list()
-    for i in range(len(content)):
-        if (encoder is not None and encoder.classes_[y_hat[i]] != 'neither') or y_hat[i] == 1:
-            print('Content: {}'.format(content[i]['text']))
-            outputList.append(content[i]['id'])
-            if encoder is not None:
-                print('Predicted: {}'.format(encoder.classes_[y_hat[i]]))
-            else:
-                print('Predicted: {}'.format(y_hat[i]))
+    print('Got {} items'.format(len(docs)))
 
-    return jsonify({ 'success': True, 'ids': outputList })
+    for i in range(len(docs)):
+        is_bad = (encoder is not None and encoder.classes_[y_hat[i]] != 'neither') or y_hat[i] == 1
+
+        if is_bad:
+            d_id = docs[i]['id']
+            print('docs: {}'.format(docs[i]['text']))
+            output_list.append(d_id)
+
+
+            if encoder is None:
+                print('Predicted: {}'.format(y_hat[i]))
+            else:
+                print('Predicted: {}'.format(encoder.classes_[y_hat[i]]))
+
+        if r is not None:
+            r.set(d_id, is_bad)
+
+    return jsonify({ 'success': True, 'ids': output_list })
