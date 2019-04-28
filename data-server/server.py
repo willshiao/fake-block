@@ -95,8 +95,8 @@ def classify():
 
     if len(docs) > 0:
         if vectorizer is not None:
-            docs = [cleanText(doc['text']) for doc in docs]
-            X = vectorizer.transform(docs)
+            cleaned_docs = [cleanText(doc['text']) for doc in docs]
+            X = vectorizer.transform(cleaned_docs)
             y_hat = classifier.predict(X)
         else:
             X = np.array([vectorizeText(doc['text']) for doc in docs])
