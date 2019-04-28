@@ -99,7 +99,7 @@ def classify():
         X = vectorizer.transform(docs)
         y_hat = classifier.predict(X)
     else:
-        X = np.array([vectorizeText(x) for x in docs])
+        X = np.array([vectorizeText(doc['text']) for doc in docs])
         y_hat = classifier.predict(X)
     
     print('Got {} items'.format(len(docs)))
@@ -119,6 +119,6 @@ def classify():
                 print('Predicted: {}'.format(encoder.classes_[y_hat[i]]))
 
         if r is not None:
-            r.set(d_id, is_bad)
+            r.set(d_id, 1 if is_bad else 0)
 
     return jsonify({ 'success': True, 'ids': output_list })
