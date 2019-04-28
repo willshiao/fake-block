@@ -1,6 +1,13 @@
 const tweetSet = new Set([])
 let lastSize = 0
+let thanosMode = true
 const particleQueue = []
+
+chrome.storage.sync.get('isThanos', (data) => {
+  console.log('Got value of isThanos:', data)
+  if (data) thanosMode = data.isThanos
+})
+
 // let test = true
 
 // function executeQueue (q, idx) {
@@ -10,7 +17,7 @@ const particleQueue = []
 // }
 
 function doParticle () {
-  if (particleQueue.length > 0) {
+  if (particleQueue.length > 0 && thanosMode) {
     particleQueue[0].disintegrate()
     particleQueue.shift()
   }
@@ -62,24 +69,9 @@ function jon () {
 
     tweetList.each((key, li) => {
       const $li = $(li)
-      
+
       if ($li.data() && toHide.has($li.data().itemId)) {
-        const particles = new Particles(li, {
-          direction: 'left',
-          color: 'black',
-          complete () {
-            $li.css('display', 'none')
-            $li.parent().parent().remove()
-          }
-        })
-        particleQueue.push(particles)
-        // particles.disintegrate()
-        // console.log('Hiding: ', $li.data().itemId)
-        // $li.fadeOut(3000)
-        // $li.css('display', 'none')
-      } else if (!($li.hasClass("spamButton"))) {
-        const spamButton = $('<button class="spamButton" />').addClass('spamButton').text('Spam?')
-        spamButton.click(function() {
+        if (thanosMode) {
           const particles = new Particles(li, {
             direction: 'left',
             color: 'black',
@@ -88,10 +80,32 @@ function jon () {
               $li.parent().parent().remove()
             }
           })
-          particleQueue.push(particles)   
+
+          particleQueue.push(particles)
+        } else {
+          $li.css('display', 'none')
+        }
+      } else if (!($li.hasClass('spam-container'))) {
+        const spamButton = $('<button class="spamButton" />')
+          .text('Spam?')
+
+        spamButton.click(function () {
+          if (thanosMode) {
+            const particles = new Particles(li, {
+              direction: 'left',
+              color: 'black',
+              complete () {
+                $li.css('display', 'none')
+                $li.parent().parent().remove()
+              }
+            })
+            particleQueue.push(particles)
+          } else {
+            $li.css('display', 'none')
+          }
         })
         spamButton.prependTo($li)
-        $li.addClass('spamButton')
+        $li.addClass('spam-container')
       }
     })
     // executeQueue(particleQueue, 0)
@@ -100,11 +114,17 @@ function jon () {
 }
 
 $(function () {
-  chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
-      if (msg.data !== undefined) {
-          console.log(msg.data);
-      }
-  });
+  // chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+  //   if (msg.data !== undefined) {
+  //     thanosMode = msg.data
+  //   }
+  // })
+  chrome.storage.onChanged.addListener(function (changes, namespace) {
+    for (let key in changes) {
+      if (key !== 'isThanos') continue
+      thanosMode = changes[key].newValue
+    }
+  })
   jon()
   setInterval(doParticle, 400)
 })
