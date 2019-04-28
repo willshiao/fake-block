@@ -93,14 +93,14 @@ def classify():
             else:
                 docs.append(content[i])
 
-
-    if vectorizer is not None:
-        docs = [cleanText(doc['text']) for doc in docs]
-        X = vectorizer.transform(docs)
-        y_hat = classifier.predict(X)
-    else:
-        X = np.array([vectorizeText(doc['text']) for doc in docs])
-        y_hat = classifier.predict(X)
+    if len(docs) > 0:
+        if vectorizer is not None:
+            docs = [cleanText(doc['text']) for doc in docs]
+            X = vectorizer.transform(docs)
+            y_hat = classifier.predict(X)
+        else:
+            X = np.array([vectorizeText(doc['text']) for doc in docs])
+            y_hat = classifier.predict(X)
     
     print('Got {} items'.format(len(docs)))
 
