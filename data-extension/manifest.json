@@ -24,7 +24,8 @@
     }
   },
   "content_scripts":[{
-    "js": ["lib/jquery.js", "content.js"],
+    "css": ["lib/particles.css"],
+    "js": ["lib/jquery.js", "lib/anime.min.js", "lib/particles.js", "content.js"],
     "matches": ["https://twitter.com/*"]
   }],
   "icons": {
