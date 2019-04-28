@@ -17,6 +17,7 @@ function doParticle () {
 }
 
 function jon () {
+
   const tweetList = $('#stream-items-id>li')
   const tweets = []
   // console.log('Got tweet list size:', tweetList.length)
@@ -99,6 +100,11 @@ function jon () {
 }
 
 $(function () {
+  chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
+      if (msg.data !== undefined) {
+          console.log(msg.data);
+      }
+  });
   jon()
   setInterval(doParticle, 400)
 })
