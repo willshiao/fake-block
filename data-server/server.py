@@ -91,7 +91,7 @@ def classify():
                 if r.get(t_id) == 1:
                     output_list.append(t_id)
             else:
-                docs.append(t_id)
+                docs.append(content[i])
 
 
     if vectorizer is not None:
